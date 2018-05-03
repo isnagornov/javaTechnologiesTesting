@@ -3,28 +3,32 @@ package files;
 import java.io.*;
 
 public class SplitFileExecutor {
-    private static String FILE_NAME = "D:/Temp/file/file.mp4";
-    private static int PART_SIZE = 4 * 1024 * 1024;
 
     public static void main(String[] args) {
-        File inputFile = new File(FILE_NAME);
+        final String FILE_NAME = args[0];
+        final int PART_SIZE = Integer.valueOf(args[1]) * 1024 * 1024;
+
+        File inputFile = new File(args[0]);
 
         int fileSize = (int) inputFile.length();
 
         if (fileSize > PART_SIZE) {
             try (FileInputStream fileInputStream = new FileInputStream(inputFile);
                  InputStream bufferedInputStream = new BufferedInputStream(fileInputStream)) {
+                boolean quit = false;
+                int chunkIdx = 1;
+                while (!quit) {
+                    int available = bufferedInputStream.available();
 
-                int partsLength = fileSize / PART_SIZE;
-                int lastPartSize = fileSize % PART_SIZE;
-
-                for (int chunkIdx = 1; chunkIdx <= partsLength; chunkIdx++) {
-                    writePart(bufferedInputStream, chunkIdx, PART_SIZE);
+                    if (available > PART_SIZE) {
+                        writePart(bufferedInputStream, FILE_NAME + ".part" + Integer.toString(chunkIdx++), PART_SIZE);
+                    } else {
+                        writePart(bufferedInputStream, FILE_NAME + ".part" + Integer.toString(chunkIdx++), available);
+                        quit = true;
+                    }
                 }
 
-                if (lastPartSize > 0) {
-                    writePart(bufferedInputStream, partsLength + 1, lastPartSize);
-                }
+                System.out.println(String.format("File %s successfully splitted to %d parts", FILE_NAME, chunkIdx - 1));
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -35,17 +39,15 @@ public class SplitFileExecutor {
 
     }
 
-    private static void writePart(InputStream inputStream, int chunkIdx, int size) throws IOException {
+    private static void writePart(InputStream inputStream, String fileName, int fileSize) throws IOException {
+        byte[] byteChunkPart = new byte[fileSize];
 
-        byte[] byteChunkPart = new byte[size];
-        inputStream.read(byteChunkPart, 0, size);
+        inputStream.read(byteChunkPart, 0, fileSize);
 
-        try (FileOutputStream fileOutputStream = new FileOutputStream(
-                new File(FILE_NAME + ".part" + Integer.toString(chunkIdx)));
+        try (FileOutputStream fileOutputStream = new FileOutputStream(new File(fileName));
              BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream)) {
             bufferedOutputStream.write(byteChunkPart);
         }
-
     }
 
 }

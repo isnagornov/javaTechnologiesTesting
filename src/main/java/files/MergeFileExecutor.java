@@ -1,54 +1,64 @@
 package files;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public class MergeFileExecutor {
 
-    private static String INPUT_NAME = "D:/Temp/file/file.mp4";
-    private static String OUT_FILENAME = "D:/Temp/file/out.mp4";
-
     public static void main(String[] args) {
+        final String INPUT_FILE_NAME = args[0];
+        final String OUTPUT_FILE_NAME = args[1];
 
-        List<File> files = new ArrayList<>();
+        File homeDir = new File(INPUT_FILE_NAME);
+        File[] partFiles = homeDir.listFiles((dir, name) -> {
+            File foundFile = new File(dir.getName() + "/" + name);
 
-        int chunkIdx = 1;
-        while (true) {
-            File file = new File(INPUT_NAME + ".part" + String.valueOf(chunkIdx));
+            return foundFile.getName().contains(".part");
+        });
 
-            if (!file.exists()) {
-                break;
-            } else {
-                files.add(file);
-                chunkIdx++;
-            }
+        if (partFiles == null || partFiles.length == 0) {
+            throw new RuntimeException("Can't merge to single file, parts not found");
         }
 
-        if (!files.isEmpty()) {
-            try (OutputStream fileOutputStream = new FileOutputStream(OUT_FILENAME);
-                 OutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream)) {
+        List<File> partList = Arrays.asList(partFiles);
+        partList.sort(new Comparator<File>() {
+            @Override
+            public int compare(File file1, File file2) {
+                String file1Name = file1.getName();
+                String file2Name = file2.getName();
 
-                for (File file: files) {
-                    try (FileInputStream fileInputStream = new FileInputStream(file);
-                         InputStream bufferedInputStream = new BufferedInputStream(fileInputStream)) {
+                String file1Number = file1Name.split(".part")[1];
+                String file2Number = file2Name.split(".part")[1];
 
-                        byte[] fileBytes = new byte[(int) file.length()];
-                        bufferedInputStream.read(fileBytes, 0,(int)  file.length());
+                return Integer.valueOf(file1Number).compareTo(Integer.valueOf(file2Number));
+            }
+        });
 
-                        bufferedOutputStream.write(fileBytes);
+        try (OutputStream fileOutputStream = new FileOutputStream(OUTPUT_FILE_NAME);
+             OutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream)) {
 
-                    }
+            for (File file : partFiles) {
+                try (FileInputStream fileInputStream = new FileInputStream(file);
+                     InputStream bufferedInputStream = new BufferedInputStream(fileInputStream)) {
+
+                    byte[] fileBytes = new byte[(int) file.length()];
+                    bufferedInputStream.read(fileBytes, 0, (int) file.length());
+
+                    bufferedOutputStream.write(fileBytes);
+
                 }
-
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-        } else {
-            System.out.println("Can't merge to single file, parts not found");
+
+            System.out.println(String.format("File %s successfully merged from %d parts", OUTPUT_FILE_NAME, partFiles.length));
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-
-
     }
+
+
 }
+
