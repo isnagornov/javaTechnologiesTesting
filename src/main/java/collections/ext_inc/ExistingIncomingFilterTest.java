@@ -1,4 +1,4 @@
-package ext_inc;
+package collections.ext_inc;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
