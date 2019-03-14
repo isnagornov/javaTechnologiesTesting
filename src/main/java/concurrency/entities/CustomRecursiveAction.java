@@ -1,4 +1,4 @@
-package entities;
+package concurrency.entities;
 
 import java.util.ArrayList;
 import java.util.List;

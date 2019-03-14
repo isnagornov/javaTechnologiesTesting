@@ -12,8 +12,8 @@ public class Test {
     public static void main(String[] args) throws IOException {
 
         try {
-            String jerseyJar = "C:\\Users\\Игорь\\.m2\\repository\\com\\sun\\jersey\\jersey-core\\1.19.4\\jersey-core-1.19.4.jar";
-            String javaeeJar = "C:\\Users\\Игорь\\.m2\\repository\\javax\\javaee-api\\7.0\\javaee-api-7.0.jar";
+            String jerseyJar = System.getProperty("user.home") + "\\.m2\\repository\\com\\sun\\jersey\\jersey-core\\1.19.4\\jersey-core-1.19.4.jar";
+            String javaeeJar = System.getProperty("user.home") + "\\.m2\\repository\\javax\\javaee-api\\7.0\\javaee-api-7.0.jar";
 
             JarFile jarFile1 = new JarFile(javaeeJar);
             JarFile jarFile2 = new JarFile(jerseyJar);

@@ -1,8 +1,8 @@
 package multithreading;
 
-import entities.BrokenWorker;
-import entities.WaitingWorker;
-import entities.Worker;
+import concurrency.entities.BrokenWorker;
+import concurrency.entities.WaitingWorker;
+import concurrency.entities.Worker;
 import org.junit.Test;
 
 import java.util.ArrayList;

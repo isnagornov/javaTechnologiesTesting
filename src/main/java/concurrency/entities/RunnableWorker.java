@@ -1,4 +1,4 @@
-package entities;
+package concurrency.entities;
 
 public interface RunnableWorker {
 

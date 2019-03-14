@@ -1,7 +1,7 @@
 package multithreading;
 
-import entities.CustomRecursiveAction;
-import entities.CustomRecursiveTask;
+import concurrency.entities.CustomRecursiveAction;
+import concurrency.entities.CustomRecursiveTask;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;

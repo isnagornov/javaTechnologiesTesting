@@ -1,13 +1,13 @@
-package entities;
+package concurrency.entities;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-public class BrokenWorker implements Runnable, RunnableWorker {
+public class Worker implements Runnable, RunnableWorker {
     private List<String> outputScraper;
     private CountDownLatch countDownLatch;
 
-    public BrokenWorker(List<String> outputScraper, CountDownLatch countDownLatch) {
+    public Worker(List<String> outputScraper, CountDownLatch countDownLatch) {
         this.outputScraper = outputScraper;
         this.countDownLatch = countDownLatch;
     }
@@ -15,17 +15,14 @@ public class BrokenWorker implements Runnable, RunnableWorker {
     @Override
     public void run() {
 
-        if (true) {
-            throw new RuntimeException("Oh dear, I'm a BrokenWorker");
-        }
-
         try {
             doSomeWork();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
 
-        countDownLatch.countDown();
         outputScraper.add("Counted down");
+        countDownLatch.countDown();
     }
 }
